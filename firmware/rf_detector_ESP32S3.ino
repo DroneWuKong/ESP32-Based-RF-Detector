@@ -144,10 +144,33 @@ const Sig db[] PROGMEM = {
 {"Gen","Generic","ELRS900",915,13,3},{"Gen","Generic","ELRS2.4",2437,40,1},{"Gen","Generic","Crossfire",915,13,20},{"Gen","Generic","Ghost",2442,73,4},
 // Russian UAVs (5)
 {"Tac","Zala","Lancet",868,5,20},{"Tac","Zala","Lancet",915,13,20},{"Tac","Supercam","S350",900,26,15},
-{"Tac","Orlan","10",915,26,20},{"Tac","Orlan","10-new",980,40,20}
+{"Tac","Orlan","10",915,26,20},{"Tac","Orlan","10-new",980,40,20},
+// Wifibroadcast FPV (4)
+{"FPV","OpenHD","Wifibroadcast",2437,80,10},{"FPV","OpenIPC","WFB-ng",2437,80,10},
+{"FPV","OpenHD","Wifibroadcast",5745,160,10},{"FPV","OpenIPC","WFB-ng",5745,160,10}
 };
 
 const int nSig = sizeof(db) / sizeof(Sig);
+
+// ============================================================================
+// DRONE MAC OUI DATABASE (for promiscuous mode detection)
+// ============================================================================
+
+struct OUI { uint8_t b[3]; const char* m; const char* n; };
+const OUI droneOUI[] = {
+  {{0x60, 0x60, 0x1F}, "DJI", "OcuSync"},
+  {{0x34, 0xD2, 0x62}, "DJI", "OcuSync"},
+  {{0x48, 0x1C, 0xB9}, "DJI", "OcuSync"},
+  {{0x90, 0x3A, 0xE6}, "DJI", "OcuSync"},
+  {{0xA0, 0x14, 0x3D}, "DJI", "OcuSync"},
+  {{0x58, 0xA0, 0xCB}, "DJI", "OcuSync"},
+  {{0x50, 0x1F, 0x3B}, "DJI", "OcuSync"},
+  {{0x00, 0x26, 0x7E}, "Parrot", "Drone"},
+  {{0x00, 0x12, 0x1C}, "Parrot", "Drone"},
+  {{0x90, 0x03, 0xB7}, "Autel", "EVO"},
+  {{0x1C, 0x7A, 0xE7}, "Skydio", "Drone"},
+};
+const int nOUI = sizeof(droneOUI) / sizeof(OUI);
 
 // ============================================================================
 // DETECTION STORAGE
@@ -203,6 +226,90 @@ void rstBrg() {
     brg[i].t = 0;
   }
   cBrg = 0;
+}
+
+// ============================================================================
+// PROMISCUOUS MODE (raw 802.11 frame capture — detects silent/OcuSync drones)
+// ============================================================================
+
+struct PromiDet { uint8_t mac[6]; int8_t rssi; uint8_t ch; uint32_t t; };
+#define MAX_PROMI 10
+PromiDet promiDets[MAX_PROMI];
+volatile int nPromiDet = 0;
+portMUX_TYPE promiMux = portMUX_INITIALIZER_UNLOCKED;
+
+// Wifibroadcast tracker — detects OpenHD/OpenIPC/WFB-ng by high-rate frame injection
+struct WFBTrack { uint8_t mac[6]; uint8_t ch; uint16_t count; uint32_t t; int8_t rssi; };
+#define MAX_WFB 8
+#define WFB_THRESH 20    // frames per 500ms window (~40fps min)
+#define WFB_WINDOW 500   // ms
+WFBTrack wfbTrack[MAX_WFB];
+volatile int nWFB = 0;
+
+void IRAM_ATTR promiCb(void* buf, wifi_promiscuous_pkt_type_t type) {
+  if (type != WIFI_PKT_MGMT && type != WIFI_PKT_DATA) return;
+  wifi_promiscuous_pkt_t* pkt = (wifi_promiscuous_pkt_t*)buf;
+  if (pkt->rx_ctrl.sig_len < 16) return;
+  if (pkt->rx_ctrl.rssi < rThresh) return;
+
+  uint8_t* src = pkt->payload + 10;  // Source MAC in 802.11 header
+
+  for (int i = 0; i < nOUI; i++) {
+    if (src[0] == droneOUI[i].b[0] &&
+        src[1] == droneOUI[i].b[1] &&
+        src[2] == droneOUI[i].b[2]) {
+      portENTER_CRITICAL_ISR(&promiMux);
+      bool found = false;
+      for (int j = 0; j < nPromiDet; j++) {
+        if (memcmp(promiDets[j].mac, src, 6) == 0) {
+          promiDets[j].rssi = pkt->rx_ctrl.rssi;
+          promiDets[j].t = millis();
+          found = true;
+          break;
+        }
+      }
+      if (!found && nPromiDet < MAX_PROMI) {
+        memcpy(promiDets[nPromiDet].mac, src, 6);
+        promiDets[nPromiDet].rssi = pkt->rx_ctrl.rssi;
+        promiDets[nPromiDet].ch = pkt->rx_ctrl.channel;
+        promiDets[nPromiDet].t = millis();
+        nPromiDet++;
+      }
+      portEXIT_CRITICAL_ISR(&promiMux);
+      break;
+    }
+  }
+
+  // Wifibroadcast detection: track high-rate data frames from non-associated MACs
+  // OpenHD/WFB-ng inject 30-120 frames/sec on a fixed channel — no beacon, no assoc
+  if (type == WIFI_PKT_DATA) {
+    uint32_t now = millis();
+    portENTER_CRITICAL_ISR(&promiMux);
+    bool tracked = false;
+    for (int i = 0; i < nWFB; i++) {
+      if (memcmp(wfbTrack[i].mac, src, 6) == 0) {
+        if (now - wfbTrack[i].t > WFB_WINDOW) {
+          wfbTrack[i].count = 1;
+          wfbTrack[i].t = now;
+        } else {
+          wfbTrack[i].count++;
+          wfbTrack[i].rssi = pkt->rx_ctrl.rssi;
+          wfbTrack[i].ch = pkt->rx_ctrl.channel;
+        }
+        tracked = true;
+        break;
+      }
+    }
+    if (!tracked && nWFB < MAX_WFB) {
+      memcpy(wfbTrack[nWFB].mac, src, 6);
+      wfbTrack[nWFB].ch = pkt->rx_ctrl.channel;
+      wfbTrack[nWFB].count = 1;
+      wfbTrack[nWFB].t = millis();
+      wfbTrack[nWFB].rssi = pkt->rx_ctrl.rssi;
+      nWFB++;
+    }
+    portEXIT_CRITICAL_ISR(&promiMux);
+  }
 }
 
 // ============================================================================
@@ -459,6 +566,75 @@ void scanRF() {
 // ============================================================================
 
 void scanWiFi() {
+  if (!f24G) return;
+
+  // --- Phase 1: Promiscuous channel hop ---
+  // Catches drones not broadcasting SSIDs (DJI OcuSync, silent RC links)
+  nPromiDet = 0;
+  esp_wifi_set_promiscuous_rx_cb(promiCb);
+  esp_wifi_set_promiscuous(true);
+  for (uint8_t ch = 1; ch <= 13; ch++) {
+    esp_wifi_set_channel(ch, WIFI_SECOND_CHAN_NONE);
+    delay(30);
+  }
+  esp_wifi_set_promiscuous(false);
+
+  // Process promiscuous hits
+  for (int i = 0; i < nPromiDet; i++) {
+    uint8_t* src = promiDets[i].mac;
+    for (int j = 0; j < nOUI; j++) {
+      if (src[0] == droneOUI[j].b[0] &&
+          src[1] == droneOUI[j].b[1] &&
+          src[2] == droneOUI[j].b[2]) {
+        uint16_t freq = 2407 + (promiDets[i].ch * 5);
+        int bi = 4;
+        if (useNF && promiDets[i].rssi < nFloor[bi] + nMarg) break;
+        for (int k = 0; k < nSig; k++) {
+          if (strcmp(db[k].m, droneOUI[j].m) == 0 && db[k].f >= 2400 && db[k].f <= 2500) {
+            addDet(k, freq, promiDets[i].rssi, false, 95);
+            break;
+          }
+        }
+        char mac[18];
+        snprintf(mac, sizeof(mac), "%02X:%02X:%02X:%02X:%02X:%02X",
+                 src[0], src[1], src[2], src[3], src[4], src[5]);
+        Serial.println("[PROMI] " + String(droneOUI[j].m) + " " + String(droneOUI[j].n) +
+                       " MAC:" + mac + " RSSI:" + String(promiDets[i].rssi) + "dBm");
+        break;
+      }
+    }
+  }
+
+  // Process wifibroadcast detections (OpenHD, OpenIPC/WFB-ng, EzWifibroadcast)
+  for (int i = 0; i < nWFB; i++) {
+    if (wfbTrack[i].count < WFB_THRESH) continue;
+    uint16_t freq = (wfbTrack[i].ch >= 1 && wfbTrack[i].ch <= 13)
+                    ? 2407 + (wfbTrack[i].ch * 5) : 2437;
+    int bi = 4;
+    if (useNF && wfbTrack[i].rssi < nFloor[bi] + nMarg) continue;
+    // Match against WFB sig entries in db (2.4 GHz only here)
+    for (int j = 0; j < nSig; j++) {
+      if (strcmp(db[j].c, "FPV") == 0 && db[j].f >= 2400 && db[j].f <= 2500) {
+        addDet(j, freq, wfbTrack[i].rssi, false, 80);
+        char mac[18];
+        snprintf(mac, sizeof(mac), "%02X:%02X:%02X:%02X:%02X:%02X",
+                 wfbTrack[i].mac[0], wfbTrack[i].mac[1], wfbTrack[i].mac[2],
+                 wfbTrack[i].mac[3], wfbTrack[i].mac[4], wfbTrack[i].mac[5]);
+        String msg = "[WFB] " + String(db[j].m) + " " + String(db[j].n) +
+                     " MAC:" + mac + " ch" + String(wfbTrack[i].ch) +
+                     " " + String(wfbTrack[i].rssi) + "dBm" +
+                     " (" + String(wfbTrack[i].count) + "f/500ms)";
+        Serial.println(msg);
+        if (bleOn && pTx) { pTx->setValue((msg + "\n").c_str()); pTx->notify(); }
+        break;
+      }
+    }
+  }
+  // Reset WFB tracker for next scan cycle
+  nWFB = 0;
+  memset(wfbTrack, 0, sizeof(wfbTrack));
+
+  // --- Phase 2: Active SSID scan (existing behavior) ---
   esp_wifi_set_promiscuous(specMode);
   WiFi.mode(WIFI_STA);
   int n = WiFi.scanNetworks(false, true, false, 120);
