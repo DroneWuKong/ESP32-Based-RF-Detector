@@ -675,14 +675,23 @@ void setup() {
     for (int b = 0; b < 5; b++) nFloor[b] = -120;
     uint16_t tF[] = {433, 868, 915, 1575, 2437};
     for (int i = 0; i < 4; i++) {
-      if (tF[i] <= 960) {
-        radio.setFrequency(tF[i]);
+      #ifdef USE_SX1262
+        if (tF[i] < 150 || tF[i] > 960) continue;
+      #endif
+      #ifdef USE_CC1101
+        if (tF[i] < 300 || tF[i] > 928) continue;
+      #endif
+      radio.setFrequency(tF[i]);
+      #ifdef USE_SX1262
         radio.setBandwidth(40);
-        radio.startReceive();
-        delay(100);
-        nFloor[i] = radio.getRSSI();
-        radio.standby();
-      }
+      #endif
+      #ifdef USE_CC1101
+        radio.setRxBandwidth(812.5);
+      #endif
+      radio.startReceive();
+      delay(100);
+      nFloor[i] = radio.getRSSI();
+      radio.standby();
     }
     WiFi.mode(WIFI_STA);
     int n = WiFi.scanNetworks();
