@@ -1,0 +1,112 @@
+Reference,Quantity,Value,Board,Footprint,Description,Manufacturer,Part Number,Supplier,Unit Price,Total Price
+,,,,,,,,,,
+,,,BOARD 0: MAIN POWER BOARD (40x40mm 4-Layer),,,,,,,
+PCB0,1,Main_Board_40x40mm_4L,Board 0,Custom,Main PCB 40x40mm 4-layer FR4 1.6mm,JLCPCB,Custom,JLCPCB,$3.00,$3.00
+U4,1,LM2596-SMD,Board 0,TO-263,Buck Converter IC 12V→5V 3A,Texas Instruments,LM2596S-5.0,Mouser,$ 2.50,$2.50
+U5,1,NEO-6M,Board 0,Module,GPS Module UART,u-blox,NEO-6M,AliExpress,$10.00,$10.00
+U7,1,MicroSD-Module,Board 0,Module,MicroSD Card Module SPI,Generic,SD Module,AliExpress,$2.50,$2.50
+D1,1,SS34,Board 0,DO-214AC,Schottky Diode 3A 40V SMD,Vishay,SS34,Mouser,$0.20,$0.20
+F1,1,MF-R300,Board 0,1812,Polyfuse 3A Resettable SMD,Bourns,MF-R300,Mouser,$0.50,$0.50
+C1,1,1000uF,Board 0,SMD,Electrolytic 1000µF 25V SMD,Panasonic,EEE-FK1E102P,Mouser,$1.20,$1.20
+C2,1,1000uF,Board 0,SMD,Electrolytic 1000µF 16V SMD,Panasonic,EEE-FK1C102P,Mouser,$1.20,$1.20
+C3,1,100uF,Board 0,SMD,Tantalum 100µF 6.3V SMD,Kemet,T491D107K006AT,Mouser,$0.50,$0.50
+C4,2,100nF,Board 0,0805,Ceramic 100nF 50V X7R,Generic,100nF 0805,AliExpress,$0.10,$0.20
+C6,4,10uF,Board 0,0805,Ceramic 10µF 16V X7R,Generic,10µF 0805,AliExpress,$0.60,$0.60
+R1,1,220,Board 0,0805,Resistor 220Ω 1/8W SMD,Generic,220Ω 0805,AliExpress,$0.05,$0.05
+J1,1,Screw_Terminal,Board 0,5.08mm,12V Input Terminal 2-pin,Generic,KF301-2P,AliExpress,$0.30,$0.30
+J10,2,Header_1x19_Female,Board 0,2.54mm,Female Header 1x19 for ESP32,Generic,1x19 Female,AliExpress,$1.00,$2.00
+,,,,,,,,Board 0 Subtotal:,$24.75
+,,,,,,,,,,
+,,,BOARD 1: ESP32-S3 DEVKIT (38x26mm - OFF-THE-SHELF),,,,,,,
+U1,1,ESP32-S3-DevKitC-1-N16R8,Board 1,Module,ESP32-S3 Dev Board 16MB/8MB,Espressif,ESP32-S3-N16R8,Amazon/AliExpress,$10.00,$10.00
+J11,2,Header_1x19_Stacking,Board 1,2.54mm,Stacking Header Female-Male,Samtec,SSW-119-02-G-D,Mouser,$2.00,$4.00
+,,,,,,,,Board 1 Subtotal:,$14.00
+,,,,,,,,,,
+,,,BOARD 2: RF DAUGHTER BOARD (40x40mm 2-Layer),,,,,,,
+PCB2,1,RF_Daughter_40x40mm,Board 2,Custom,RF Daughter PCB 40x40mm 2-layer,JLCPCB,Custom,JLCPCB,$1.00,$1.00
+U2,1,BL-M8812EU2,Board 2,32x32mm,5GHz WiFi Module RTL8812EU 800mW,LB-LINK,BL-M8812EU2,Taobao/AliExpress,$12.50,$12.50
+U3,1,Wio-SX1262,Board 2,25x25mm,LoRa Module 150-960MHz -148dBm,Seeed Studio,Wio-SX1262,Seeed/Mouser,$17.50,$17.50
+C20,4,10uF,Board 2,0805,Ceramic 10µF 16V X7R decoupling,Generic,10µF 0805,AliExpress,$0.60,$0.60
+C21,2,100nF,Board 2,0805,Ceramic 100nF 50V X7R,Generic,100nF 0805,AliExpress,$0.10,$0.20
+J12,2,Header_1x10_Female,Board 2,2.54mm,Female Header to ESP32,Generic,1x10 Female,AliExpress,$0.50,$1.00
+J13,1,Header_1x6_Male,Board 2,2.54mm,Male Header to Display,Generic,1x6 Male,AliExpress,$0.20,$0.20
+J3,1,IPEX_Connector,Board 2,SMD,IPEX Connector for BL-M88 J0,Generic,U.FL,AliExpress,$0.30,$0.30
+J4,1,IPEX_Connector,Board 2,SMD,IPEX Connector for BL-M88 J1,Generic,U.FL,AliExpress,$0.30,$0.30
+J2,1,SMA_EdgeMount,Board 2,SMA,SMA Female for SX1262 antenna,Amphenol,132289,Mouser,$1.50,$1.50
+CABLE1,2,IPEX_to_SMA_50mm,Board 2,Pigtail,IPEX to SMA Pigtail 50mm,Generic,IPEX-SMA,AliExpress,$4.00,$4.00
+,,,,,,,,Board 2 Subtotal:,$39.10
+,,,,,,,,,,
+,,,BOARD 3: DISPLAY & UI BOARD (40x30mm 2-Layer),,,,,,,
+PCB3,1,Display_Board_40x30mm,Board 3,Custom,Display PCB 40x30mm 2-layer,JLCPCB,Custom,JLCPCB,$1.00,$1.00
+U6,1,SSD1306,Board 3,Module,OLED 128x64 I2C 0.96 inch,Generic,SSD1306,AliExpress,$4.00,$4.00
+D2,1,LED_0805,Board 3,0805,LED Green 0805 SMD,Generic,LED Green,AliExpress,$0.10,$0.10
+R10,1,220,Board 3,0805,Resistor 220Ω LED current limit,Generic,220Ω 0805,AliExpress,$0.05,$0.05
+BZ1,1,Buzzer_SMD,Board 3,12mm,Piezo Buzzer 12mm SMD,Generic,Buzzer 12mm,AliExpress,$1.00,$1.00
+SW1,1,Tactile_6x6,Board 3,6x6mm,Tactile Button 6x6mm SMD,Generic,6x6mm,AliExpress,$0.20,$0.20
+SW2,1,Tactile_6x6,Board 3,6x6mm,Tactile Button 6x6mm SMD,Generic,6x6mm,AliExpress,$0.20,$0.20
+J14,1,Header_1x6_Female,Board 3,2.54mm,Female Header from RF board,Generic,1x6 Female,AliExpress,$0.20,$0.20
+,,,,,,,,Board 3 Subtotal:,$6.75
+,,,,,,,,,,
+,,,STACKING HARDWARE & INTERCONNECTS,,,,,,,
+STANDOFF1,4,M2.5x10mm,Standoff,Brass,Standoff Female-Female 10mm,Generic,M2.5x10mm,AliExpress,$0.60,$0.60
+STANDOFF2,4,M2.5x8mm,Standoff,Brass,Standoff Female-Female 8mm,Generic,M2.5x8mm,AliExpress,$0.50,$0.50
+STANDOFF3,4,M2.5x6mm,Standoff,Brass,Standoff Female-Female 6mm,Generic,M2.5x6mm,AliExpress,$0.40,$0.40
+SCREW,12,M2.5x6mm,Hardware,Steel,Machine Screw M2.5x6mm,Generic,M2.5x6,AliExpress,$0.50,$0.50
+,,,,,,,,Stacking Hardware Subtotal:,$2.00
+,,,,,,,,,,
+,,,ANTENNAS,,,,,,,
+ANT1,1,868_915MHz_SMA,Antenna,External,868/915 MHz Antenna 2-5dBi SMA,Generic,868/915 SMA,AliExpress,$5.00,$5.00
+ANT2,1,5.8GHz_SMA,Antenna,External,5.8 GHz Antenna 3-5dBi SMA,Generic,5.8GHz SMA,AliExpress,$3.50,$3.50
+ANT3,1,5.8GHz_SMA,Antenna,External,5.8 GHz Antenna 3-5dBi SMA,Generic,5.8GHz SMA,AliExpress,$3.50,$3.50
+,,,,,,,,Antennas Subtotal:,$12.00
+,,,,,,,,,,
+,,,POWER SUPPLY,,,,,,,
+PSU,1,12V_3A_Adapter,External,Barrel Jack,12V 3A Wall Adapter,Generic,12V 3A,Amazon,$8.00,$8.00
+,,,,,,,,Power Supply Subtotal:,$8.00
+,,,,,,,,,,
+,,,3D PRINTED CASE,,,,,,,
+CASE_TOP,1,Stacked_Case_Top,3D Print,PETG,Top Shell 45x45x20mm,Custom,STL File,Home Print,$1.00,$1.00
+CASE_BTM,1,Stacked_Case_Bottom,3D Print,PETG,Bottom Shell 45x45x20mm,Custom,STL File,Home Print,$1.00,$1.00
+FEET,4,Rubber_Feet_8mm,Hardware,Adhesive,Rubber Feet 8mm diameter,Generic,Rubber Feet,AliExpress,$0.25,$0.25
+,,,,,,,,Case Subtotal:,$2.25
+,,,,,,,,,,
+,,,,,,,,,,
+,,,GRAND TOTAL - STACKED VERSION:,,,,,
+,,,,,,,,,,
+Board 0 (Main Power):,,,,,,,,$24.75
+Board 1 (ESP32-S3):,,,,,,,,$14.00
+Board 2 (RF Daughter):,,,,,,,,$39.10
+Board 3 (Display):,,,,,,,,$6.75
+Stacking Hardware:,,,,,,,,$2.00
+Antennas:,,,,,,,,$12.00
+Power Supply:,,,,,,,,$8.00
+Case:,,,,,,,,$2.25
+,,,,,,,,,,
+TOTAL PER COMPLETE UNIT:,,,,,,,,$108.85
+,,,,,,,,,,
+,,,COST OPTIMIZATION NOTES:,,,,,,,
+"1. PCB costs assume JLCPCB 5-piece minimum order (cost shown is per board set)",,,,,,,
+"2. Total for 5 complete units: $463 ($92.60 per unit with volume discount)",,,,,,,
+"3. AliExpress prices lower but 2-4 week shipping",,,,,,,
+"4. Amazon prices 20-30% higher but faster delivery",,,,,,,
+"5. Buy stacking headers in bulk (10-pack) saves 30%",,,,,,,
+"6. 3D print cost assumes home printing PLA/PETG filament",,,,,,,
+,,,,,,,,,,
+,,,ALTERNATIVE BUDGET BUILD:,,,,,,,
+"Skip GPS, SD card, fancy antennas for first build:",,,,,,,
+Basic stacked build cost:,,,,,,,,$85.00
+Add features later incrementally,,,,,,,
+,,,,,,,,,,
+,,,TOOLS NEEDED (One-Time Investment):,,,,,,,
+Soldering iron temperature controlled:,,,,,,,,$25.00
+Solder 60/40 or lead-free:,,,,,,,,$5.00
+Flux pen:,,,,,,,,$3.00
+Tweezers for SMD:,,,,,,,,$3.00
+Desoldering braid:,,,,,,,,$2.00
+Wire cutters flush:,,,,,,,,$5.00
+Magnifying glass or loupe:,,,,,,,,$8.00
+,,,,,,,,,,
+TOOLS TOTAL:,,,,,,,,$51.00
+,,,,,,,,,,
+GRAND TOTAL (First Build with Tools):,,,,,,,,$159.85
+"Subsequent builds: Only $108.85 (already have tools!)",,,,,,,

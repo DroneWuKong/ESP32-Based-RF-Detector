@@ -1,0 +1,740 @@
+# FLUX AI STRUCTURED DATA - BOARD 0 (MAIN POWER)
+## Component List + Complete Netlist in Importable Format
+
+═══════════════════════════════════════════════════════════════════════════
+COMPONENTS - BOARD 0 (Main Power, 40x40mm)
+═══════════════════════════════════════════════════════════════════════════
+
+## Power Management
+
+U4:
+  type: IC
+  name: LM2596S-5.0
+  description: Buck Converter 12V to 5V 3A
+  package: TO-263-5
+  manufacturer: Texas Instruments
+  pins:
+    1: VIN (input voltage)
+    2: VOUT (output voltage 5V)
+    3: GND (ground)
+    4: FB (feedback - connect to VOUT)
+    5: ON/OFF (connect to VIN for always-on)
+
+## Capacitors
+
+C1:
+  type: capacitor_polarized
+  value: 1000uF
+  voltage: 25V
+  package: SMD_Electrolytic_10mm
+  description: Input filter capacitor
+  polarity: marked (negative terminal)
+
+C2:
+  type: capacitor_polarized
+  value: 1000uF
+  voltage: 16V
+  package: SMD_Electrolytic_10mm
+  description: Output filter capacitor
+  polarity: marked (negative terminal)
+
+C3:
+  type: capacitor_polarized
+  value: 100uF
+  voltage: 6.3V
+  package: SMD_7343_Tantalum
+  description: 3.3V rail filter
+  polarity: stripe indicates positive
+
+C4:
+  type: capacitor
+  value: 100nF
+  voltage: 50V
+  package: 0805
+  description: Ceramic decoupling cap
+
+C5:
+  type: capacitor
+  value: 100nF
+  voltage: 50V
+  package: 0805
+  description: Ceramic decoupling cap
+
+C6:
+  type: capacitor
+  value: 10uF
+  voltage: 16V
+  package: 0805
+  description: Ceramic decoupling cap
+
+C7:
+  type: capacitor
+  value: 10uF
+  voltage: 16V
+  package: 0805
+  description: Ceramic decoupling cap
+
+C8:
+  type: capacitor
+  value: 10uF
+  voltage: 16V
+  package: 0805
+  description: Ceramic decoupling cap
+
+C9:
+  type: capacitor
+  value: 10uF
+  voltage: 16V
+  package: 0805
+  description: Ceramic decoupling cap
+
+## Resistors
+
+R1:
+  type: resistor
+  value: 220
+  power: 0.125W
+  package: 0805
+  description: LED current limiting
+
+## Protection
+
+D1:
+  type: diode_schottky
+  name: SS34
+  current: 3A
+  voltage: 40V
+  package: DO-214AC
+  description: Reverse polarity protection
+  polarity: cathode marked with band
+
+F1:
+  type: fuse_resettable
+  name: Polyfuse
+  current: 3A
+  package: 1812
+  description: Overcurrent protection
+
+## Connectors
+
+J1:
+  type: connector_screw_terminal
+  positions: 2
+  pitch: 5.08mm
+  description: 12V DC input
+  pins:
+    1: +12V_IN
+    2: GND
+
+J10_LEFT:
+  type: connector_header_female
+  positions: 19
+  pitch: 2.54mm
+  rows: 1
+  description: ESP32 connection left row
+  pins:
+    1: +5V
+    2: +3V3
+    3: GND
+    4: GND
+    5: GPIO5
+    6: GPIO6
+    7: GPIO7
+    8: GPIO8
+    9: GPIO9
+    10: GPIO10
+    11: GPIO11
+    12: GPIO12
+    13: GPIO13
+    14: GPIO14
+    15: GPIO15
+    16: GPIO16
+    17: GPIO17
+    18: GPIO18
+    19: GPIO19
+
+J10_RIGHT:
+  type: connector_header_female
+  positions: 19
+  pitch: 2.54mm
+  rows: 1
+  description: ESP32 connection right row
+  pins:
+    20: +5V
+    21: +3V3
+    22: GND
+    23: GND
+    24: GPIO20
+    25: GPIO21
+    26: GPIO35
+    27: GPIO36
+    28: GPIO37
+    29: GPIO38
+    30: GPIO39
+    31: GPIO40
+    32: GPIO41
+    33: GPIO42
+    34: GPIO43
+    35: GPIO44
+    36: GPIO45
+    37: GPIO46
+    38: GPIO47
+
+## Modules (as connectors for schematic)
+
+U5:
+  type: connector_header
+  name: GPS_Module
+  positions: 4
+  pitch: 2.54mm
+  description: NEO-6M GPS Module
+  pins:
+    1: VCC
+    2: GND
+    3: TX
+    4: RX
+
+U7:
+  type: connector_header
+  name: SD_Module
+  positions: 6
+  pitch: 2.54mm
+  description: MicroSD Card Module
+  pins:
+    1: VCC
+    2: GND
+    3: MISO
+    4: MOSI
+    5: SCK
+    6: CS
+
+═══════════════════════════════════════════════════════════════════════════
+NETLIST - BOARD 0 (All Connections)
+═══════════════════════════════════════════════════════════════════════════
+
+## Power Distribution Nets
+
++12V_IN:
+  connections:
+    - J1.1
+    - F1.1
+
+12V_PROTECTED:
+  connections:
+    - F1.2
+    - D1.anode
+
+12V_FILTERED:
+  connections:
+    - D1.cathode
+    - C1.positive
+    - U4.1  # VIN
+
++5V:
+  connections:
+    - U4.2  # VOUT
+    - U4.4  # FB (feedback tied to output)
+    - C2.positive
+    - C4.1
+    - C5.1
+    - J10_LEFT.1
+    - J10_RIGHT.20
+
++3V3:
+  connections:
+    - C3.positive
+    - C6.1
+    - C7.1
+    - C8.1
+    - C9.1
+    - U5.1  # GPS VCC
+    - U7.1  # SD VCC
+    - J10_LEFT.2
+    - J10_RIGHT.21
+
+GND:
+  connections:
+    - J1.2
+    - C1.negative
+    - C2.negative
+    - C3.negative
+    - C4.2
+    - C5.2
+    - C6.2
+    - C7.2
+    - C8.2
+    - C9.2
+    - U4.3  # Regulator GND
+    - U5.2  # GPS GND
+    - U7.2  # SD GND
+    - J10_LEFT.3
+    - J10_LEFT.4
+    - J10_RIGHT.22
+    - J10_RIGHT.23
+
+## Enable/Control
+
+ENABLE:
+  connections:
+    - U4.5  # ON/OFF pin
+    - U4.1  # Tie to VIN for always-on
+
+## Signal Nets - GPS
+
+GPS_TX_OUT:
+  description: GPS transmit to ESP32 receive
+  connections:
+    - U5.3  # GPS TX
+    - J10_RIGHT.34  # GPIO43 (ESP32 RX)
+
+GPS_RX_IN:
+  description: ESP32 transmit to GPS receive
+  connections:
+    - U5.4  # GPS RX
+    - J10_RIGHT.35  # GPIO44 (ESP32 TX)
+
+## Signal Nets - SD Card SPI
+
+SD_MISO:
+  description: SD card SPI MISO
+  connections:
+    - U7.3  # SD MISO
+    - J10_LEFT.13  # GPIO13
+
+SD_MOSI:
+  description: SD card SPI MOSI
+  connections:
+    - U7.4  # SD MOSI
+    - J10_LEFT.11  # GPIO11
+
+SD_SCK:
+  description: SD card SPI clock
+  connections:
+    - U7.5  # SD SCK
+    - J10_LEFT.12  # GPIO12
+
+SD_CS:
+  description: SD card chip select
+  connections:
+    - U7.6  # SD CS
+    - J10_LEFT.5  # GPIO5
+
+## Signal Nets - Passthrough (connected on other boards)
+
+SPI_MOSI:
+  description: Shared SPI MOSI bus
+  connections:
+    - J10_LEFT.11  # GPIO11
+
+SPI_MISO:
+  description: Shared SPI MISO bus
+  connections:
+    - J10_LEFT.13  # GPIO13
+
+SPI_SCK:
+  description: Shared SPI clock bus
+  connections:
+    - J10_LEFT.12  # GPIO12
+
+SX1262_NSS:
+  description: SX1262 chip select
+  connections:
+    - J10_LEFT.10  # GPIO10
+
+I2C_SCL:
+  description: I2C clock to OLED
+  connections:
+    - J10_LEFT.17  # GPIO17
+
+I2C_SDA:
+  description: I2C data to OLED
+  connections:
+    - J10_LEFT.18  # GPIO18
+
+USB_DM:
+  description: USB data minus to BL-M8812EU2
+  connections:
+    - J10_LEFT.19  # GPIO19
+
+USB_DP:
+  description: USB data plus to BL-M8812EU2
+  connections:
+    - J10_RIGHT.24  # GPIO20
+
+LED_GPIO:
+  description: LED control signal
+  connections:
+    - R1.1  # One side of resistor
+    # R1.2 connects to LED on display board
+
+BUZZER:
+  description: Buzzer control
+  connections:
+    - J10_RIGHT.36  # GPIO45
+
+BUTTON1:
+  description: Button 1 input
+  connections:
+    - J10_LEFT.5  # GPIO0 (shares pin position, check ESP32 pinout)
+
+BUTTON2:
+  description: Button 2 input
+  connections:
+    - J10_RIGHT.26  # GPIO35
+
+═══════════════════════════════════════════════════════════════════════════
+NET PROPERTIES - BOARD 0
+═══════════════════════════════════════════════════════════════════════════
+
+## Trace Width Requirements
+
++12V_IN:
+  min_width: 2.0mm
+  max_current: 3A
+  priority: critical
+
+12V_PROTECTED:
+  min_width: 2.0mm
+  max_current: 3A
+  priority: critical
+
+12V_FILTERED:
+  min_width: 2.0mm
+  max_current: 3A
+  priority: critical
+
++5V:
+  min_width: 1.5mm
+  max_current: 3A
+  priority: high
+
++3V3:
+  min_width: 0.8mm
+  max_current: 1A
+  priority: high
+
+GND:
+  min_width: use_plane
+  via_stitching: yes
+  thermal_relief: yes
+
+GPS_TX_OUT, GPS_RX_IN:
+  min_width: 0.3mm
+  max_length: 100mm
+  priority: low
+
+SD_MISO, SD_MOSI, SD_SCK, SD_CS:
+  min_width: 0.4mm
+  group_routing: yes
+  priority: medium
+
+SPI_MOSI, SPI_MISO, SPI_SCK, SX1262_NSS:
+  min_width: 0.4mm
+  group_routing: yes
+  priority: medium
+
+I2C_SCL, I2C_SDA:
+  min_width: 0.4mm
+  group_routing: yes
+  max_length: 150mm
+  priority: medium
+
+USB_DM, USB_DP:
+  min_width: 0.5mm
+  differential_pair: yes
+  spacing: 0.3mm
+  impedance: 90ohm
+  length_matching: 2mm
+  priority: critical
+
+LED_GPIO, BUZZER, BUTTON1, BUTTON2:
+  min_width: 0.3mm
+  priority: low
+
+═══════════════════════════════════════════════════════════════════════════
+CLEARANCE RULES - BOARD 0
+═══════════════════════════════════════════════════════════════════════════
+
+default_clearance: 0.2mm
+
+clearance_exceptions:
+  power_to_signal: 0.3mm
+  power_to_power: 0.3mm
+  trace_to_edge: 0.5mm
+  trace_to_hole: 0.3mm
+  usb_to_any: 0.5mm
+
+═══════════════════════════════════════════════════════════════════════════
+VIA SPECIFICATIONS - BOARD 0
+═══════════════════════════════════════════════════════════════════════════
+
+signal_via:
+  drill: 0.8mm
+  pad: 1.2mm
+  mask: 1.3mm
+
+power_via:
+  drill: 0.8mm
+  pad: 1.2mm
+  mask: 1.3mm
+  use_multiple: yes
+
+thermal_via:
+  drill: 0.8mm
+  pad: 1.0mm
+  mask: tented
+  grid_spacing: 2mm
+
+═══════════════════════════════════════════════════════════════════════════
+COMPONENT PLACEMENT COORDINATES - BOARD 0
+═══════════════════════════════════════════════════════════════════════════
+
+## Origin: Bottom-left corner (0, 0)
+## Units: millimeters
+## Rotation: 0° = component upright, text readable from bottom
+
+U4:
+  position: [8, 32]
+  rotation: 0
+  side: top
+
+C1:
+  position: [15, 30]
+  rotation: 0
+  side: top
+
+C2:
+  position: [15, 25]
+  rotation: 0
+  side: top
+
+C3:
+  position: [22, 28]
+  rotation: 0
+  side: top
+
+C4:
+  position: [25, 30]
+  rotation: 0
+  side: top
+
+C5:
+  position: [28, 30]
+  rotation: 0
+  side: top
+
+C6:
+  position: [25, 27]
+  rotation: 0
+  side: top
+
+C7:
+  position: [28, 27]
+  rotation: 0
+  side: top
+
+C8:
+  position: [25, 24]
+  rotation: 0
+  side: top
+
+C9:
+  position: [28, 24]
+  rotation: 0
+  side: top
+
+R1:
+  position: [32, 35]
+  rotation: 0
+  side: top
+
+D1:
+  position: [10, 25]
+  rotation: 90  # Cathode facing right
+  side: top
+
+F1:
+  position: [8, 20]
+  rotation: 0
+  side: top
+
+J1:
+  position: [5, 12]
+  rotation: 0
+  side: top
+
+J10_LEFT:
+  position: [18, 8]
+  rotation: 0
+  side: top
+
+J10_RIGHT:
+  position: [18, 12]
+  rotation: 0
+  side: top
+
+U5:
+  position: [30, 30]
+  rotation: 0
+  side: bottom  # GPS on bottom
+
+U7:
+  position: [35, 15]
+  rotation: 0
+  side: bottom  # SD card on bottom
+
+═══════════════════════════════════════════════════════════════════════════
+MOUNTING HOLES - BOARD 0
+═══════════════════════════════════════════════════════════════════════════
+
+H1:
+  position: [5, 5]
+  drill: 3.2mm
+  plated: no
+  keepout_radius: 5mm
+
+H2:
+  position: [35, 5]
+  drill: 3.2mm
+  plated: no
+  keepout_radius: 5mm
+
+H3:
+  position: [5, 35]
+  drill: 3.2mm
+  plated: no
+  keepout_radius: 5mm
+
+H4:
+  position: [35, 35]
+  drill: 3.2mm
+  plated: no
+  keepout_radius: 5mm
+
+═══════════════════════════════════════════════════════════════════════════
+BOARD OUTLINE - BOARD 0
+═══════════════════════════════════════════════════════════════════════════
+
+shape: rectangle_rounded
+width: 40mm
+height: 40mm
+corner_radius: 2mm
+origin: [0, 0]  # bottom-left
+
+═══════════════════════════════════════════════════════════════════════════
+LAYER STACKUP REQUEST - BOARD 0 (4-layer)
+═══════════════════════════════════════════════════════════════════════════
+
+## If Flux AI supports 4-layer, use this configuration:
+
+layer_count: 4
+total_thickness: 1.6mm
+
+layers:
+  1:
+    name: F.Cu (Top)
+    type: signal
+    thickness: 35um  # 1oz copper
+    material: copper
+    
+  2:
+    name: +5V Plane
+    type: plane
+    thickness: 35um  # 1oz copper
+    material: copper
+    net: +5V
+    thermal_relief: yes
+    
+  3:
+    name: +3V3 / Signal
+    type: mixed
+    thickness: 35um  # 1oz copper
+    material: copper
+    primary_net: +3V3
+    allow_routing: yes
+    
+  4:
+    name: B.Cu / GND
+    type: plane
+    thickness: 35um  # 1oz copper
+    material: copper
+    net: GND
+
+dielectric:
+  material: FR4
+  Er: 4.5
+  total_thickness: 1.494mm  # (1.6mm - 4*0.035mm copper)
+
+## If Flux AI does NOT support 4-layer:
+
+fallback_to_2layer: yes
+use_top_pour: yes
+top_pour_net: +5V
+bottom_pour_net: GND
+isolate_pours: 0.5mm
+
+═══════════════════════════════════════════════════════════════════════════
+SILKSCREEN TEXT - BOARD 0
+═══════════════════════════════════════════════════════════════════════════
+
+top_silkscreen:
+  - text: "RF DETECTOR v2.0"
+    position: [20, 2]
+    size: 1.5mm
+    align: center
+    
+  - text: "MAIN POWER - 40x40mm"
+    position: [20, 38]
+    size: 1.0mm
+    align: center
+
+  - text: "+12V"
+    position: [5, 15]
+    size: 0.8mm
+    
+  - text: "GND"
+    position: [5, 10]
+    size: 0.8mm
+
+component_refs: yes  # Show U4, C1-C9, R1, D1, F1, J1, J10
+
+polarity_marks:
+  - component: C1
+    mark: negative_stripe
+  - component: C2
+    mark: negative_stripe
+  - component: C3
+    mark: positive_stripe
+  - component: D1
+    mark: cathode_band
+
+═══════════════════════════════════════════════════════════════════════════
+DESIGN RULE CHECK (DRC) REQUIREMENTS - BOARD 0
+═══════════════════════════════════════════════════════════════════════════
+
+minimum_trace: 0.2mm
+minimum_spacing: 0.2mm
+minimum_annular_ring: 0.1mm
+minimum_drill: 0.3mm
+minimum_hole_to_hole: 0.5mm
+
+trace_to_edge: 0.5mm
+copper_to_edge: 0.5mm
+
+maximum_aspect_ratio: 10:1  # for vias
+
+solder_mask_clearance: 0.05mm
+silkscreen_width: 0.15mm
+silkscreen_clearance: 0.2mm
+
+═══════════════════════════════════════════════════════════════════════════
+END OF BOARD 0 STRUCTURED DATA
+═══════════════════════════════════════════════════════════════════════════
+
+This data is formatted to be:
+1. Human-readable (you can verify)
+2. Machine-parseable (Flux AI can import)
+3. Complete (all connections specified)
+4. Flexible (works with 2-layer or 4-layer)
+
+Next: Create similar files for Board 2 (RF) and Board 3 (Display)?
