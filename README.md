@@ -2,7 +2,7 @@
 
 **Compact, multi-frequency RF detector for drone detection and spectrum monitoring**
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![License](https://img.shields.io/badge/license-Proprietary-red.svg)
 ![Status](https://img.shields.io/badge/status-ready--to--build-green.svg)
 
 ## 🎯 Overview
@@ -230,23 +230,13 @@ See `VISUAL_WIRING_DIAGRAM.md` for complete connection details.
 - Do not interfere with licensed spectrum
 - Intended for hobbyist/educational use
 
-## 🤝 Contributing
-
-Contributions welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Submit pull request with description
-
-Areas for improvement:
-- Additional RF module support
-- Enhanced web interface
-- Direction finding algorithms
-- Power optimization
-- Case design variations
-
 ## 📝 License
 
-MIT License - see LICENSE file for details
+**Proprietary — All Rights Reserved.** Copyright © Midwest Nice UAS.
+
+This software and hardware design are proprietary. No license to use, copy,
+modify, or distribute is granted. Licensing terms are under review (TBD); contact
+the owner for inquiries. See the `LICENSE` file.
 
 ## 🙏 Acknowledgments
 
